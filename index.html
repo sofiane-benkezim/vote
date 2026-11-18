@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CAMPUS INNOV' CHALLENGE — Vote du Public | ENSTP</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --primary: #0f172a;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
-      --gold: #f59e0b;
       --bg: #f8fafc;
       --card: #ffffff;
       --border: #e2e8f0;
@@ -21,76 +20,81 @@
       --danger: #ef4444;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 60px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-    /* Header */
+    /* دعم اللغة العربية */
+    html[lang="ar"] body {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ================= HERO SECTION ================= */
     .hero {
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-      color: white;
-      padding: 48px 20px 64px;
-      text-align: center;
-      position: relative;
+      color: white; padding: 52px 20px 68px; text-align: center; position: relative;
     }
     .badge {
-      display: inline-block;
-      background: rgba(245, 158, 11, 0.2);
-      border: 1px solid rgba(245, 158, 11, 0.5);
-      color: #fcd34d;
-      padding: 6px 16px;
-      border-radius: 99px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 14px;
-      text-transform: uppercase;
+      display: inline-block; background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.5); color: #fcd34d;
+      padding: 6px 16px; border-radius: 99px; font-size: 0.8rem;
+      font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;
     }
     .hero h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 8px; }
     .hero p.tagline { font-size: 1.05rem; color: #93c5fd; font-weight: 600; margin-bottom: 14px; }
     .hero p.desc { max-width: 680px; margin: 0 auto; color: #cbd5e1; font-size: 0.95rem; }
 
-    .admin-link {
-      position: absolute; top: 16px; right: 20px;
-      color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.82rem;
-      padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
-      transition: 0.2s;
+    .top-controls {
+      position: absolute; top: 16px; 
+      display: flex; gap: 8px; z-index: 10;
     }
-    .admin-link:hover { color: white; background: rgba(255,255,255,0.1); }
+    html[dir="ltr"] .top-controls { right: 20px; }
+    html[dir="rtl"] .top-controls { left: 20px; }
 
-    /* Container */
-    .container { max-width: 820px; margin: -36px auto 0; padding: 0 16px; position: relative; z-index: 2; }
+    .top-btn {
+      color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.1);
+      font-size: 0.82rem; font-weight: 600; padding: 8px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.2s;
+    }
+    .top-btn:hover { background: rgba(255,255,255,0.2); color: white; }
 
+    .container { max-width: 820px; margin: -36px auto 60px; padding: 0 16px; position: relative; z-index: 2; }
     .card {
-      background: var(--card);
-      border-radius: 16px;
+      background: var(--card); border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
-      border: 1px solid var(--border);
-      padding: 28px;
-      margin-bottom: 22px;
+      border: 1px solid var(--border); padding: 28px; margin-bottom: 22px;
     }
-
     .section-title {
       display: flex; align-items: center; gap: 10px;
-      font-size: 1.15rem; font-weight: 700; color: var(--primary);
-      margin-bottom: 6px;
+      font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 6px;
     }
+    html[dir="rtl"] .section-title { flex-direction: row-reverse; text-align: right; }
+
     .step-num {
       background: var(--accent); color: white; width: 28px; height: 28px;
       border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
       font-size: 0.85rem; font-weight: 800; flex-shrink: 0;
     }
     .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    html[dir="rtl"] .section-sub, html[dir="rtl"] p, html[dir="rtl"] label { text-align: right; }
 
-    /* Form Inputs */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
 
     label.field-label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: var(--primary); }
-    input[type="email"], select.form-select {
+    input[type="email"], input[type="password"], select.form-select {
       width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
       border-radius: 10px; font-size: 0.95rem; outline: none; transition: 0.2s; background: white;
     }
-    input[type="email"]:focus, select.form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
 
     /* Ranking Matrix */
     .ranking-list { display: flex; flex-direction: column; gap: 12px; }
@@ -99,9 +103,11 @@
       padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 12px;
       transition: 0.2s; background: #fff;
     }
+    html[dir="rtl"] .project-row { flex-direction: row-reverse; }
     .project-row.ranked { border-color: #93c5fd; background: #eff6ff; }
     .project-info h3 { font-size: 1rem; font-weight: 700; color: var(--primary); }
     .project-info span { font-size: 0.8rem; color: var(--muted); }
+    html[dir="rtl"] .project-info { text-align: right; }
 
     .rank-pills { display: flex; gap: 6px; flex-wrap: wrap; }
     .rank-btn {
@@ -116,32 +122,24 @@
     }
     .rank-btn:disabled { opacity: 0.35; cursor: not-allowed; background: #f1f5f9; }
 
-    @media (max-width: 600px) {
-      .project-row { flex-direction: column; align-items: flex-start; }
-      .rank-pills { width: 100%; justify-content: space-between; }
-      .rank-btn { flex: 1; height: 42px; }
-    }
-
-    /* Checkboxes */
     .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     @media (max-width: 600px) { .checkbox-grid { grid-template-columns: 1fr; } }
-
     .check-item {
       display: flex; align-items: center; gap: 10px; padding: 12px 14px;
       border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer;
       font-size: 0.9rem; font-weight: 500; transition: 0.15s; user-select: none;
     }
+    html[dir="rtl"] .check-item { flex-direction: row-reverse; text-align: right; }
     .check-item:hover { border-color: #cbd5e1; background: #f8fafc; }
     .check-item input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
 
-    /* Submit */
-    .btn-submit {
-      width: 100%; padding: 16px; background: var(--accent); color: white;
-      border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 700;
+    .btn-primary {
+      width: 100%; padding: 15px; background: var(--accent); color: white;
+      border: none; border-radius: 12px; font-size: 1.02rem; font-weight: 700;
       cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
     }
-    .btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .alert {
       padding: 14px 16px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
@@ -149,7 +147,6 @@
     }
     .alert.error { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; display: block; }
 
-    /* Success State */
     .success-box { text-align: center; padding: 44px 24px; display: none; }
     .success-icon {
       width: 68px; height: 68px; background: #d1fae5; color: var(--success);
@@ -159,96 +156,409 @@
     .success-box h2 { font-size: 1.5rem; color: var(--primary); margin-bottom: 12px; }
     .success-box p { color: var(--muted); max-width: 540px; margin: 0 auto 12px; }
     .motto { font-weight: 700; color: var(--accent); margin-top: 18px; }
+
+    /* Admin Login & Dashboard */
+    .login-wrapper {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    }
+    .login-card {
+      background: white; width: 100%; max-width: 420px; padding: 36px 28px;
+      border-radius: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+    .login-card h2 { font-size: 1.4rem; color: var(--primary); margin-bottom: 6px; }
+    .login-card p { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; }
+    .field { margin-bottom: 16px; }
+    .back-link {
+      display: block; margin-top: 18px; text-align: center; color: var(--accent);
+      background: none; border: none; width: 100%; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    }
+
+    .topbar {
+      background: var(--primary); color: white; padding: 18px 24px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    html[dir="rtl"] .topbar { flex-direction: row-reverse; }
+    .topbar h2 { font-size: 1.1rem; }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1); color: white; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-sm:hover { background: rgba(255,255,255,0.2); }
+    .btn-export { background: #10b981; border-color: #10b981; }
+
+    .dash-container { max-width: 1050px; margin: 28px auto; padding: 0 18px 60px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card {
+      background: white; padding: 20px; border-radius: 14px; border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .kpi-label { font-size: 0.8rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+    .kpi-value { font-size: 1.75rem; font-weight: 800; color: var(--primary); margin-top: 4px; }
+
+    .panel {
+      background: white; border-radius: 16px; border: 1px solid var(--border);
+      padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .panel h3 { font-size: 1.05rem; margin-bottom: 16px; color: var(--primary); }
+    html[dir="rtl"] .panel { text-align: right; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+    html[dir="ltr"] th, html[dir="ltr"] td { text-align: left; }
+    html[dir="rtl"] th, html[dir="rtl"] td { text-align: right; }
+    th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; }
+    .rank-badge {
+      display: inline-flex; width: 30px; height: 30px; border-radius: 8px;
+      align-items: center; justify-content: center; font-weight: 800; background: #e2e8f0;
+    }
+    .rank-1 { background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; }
+    .rank-2 { background: #f1f5f9; color: #334155; border: 1px solid #94a3b8; }
+    .rank-3 { background: #ffedd5; color: #9a3412; border: 1px solid #fb923c; }
+
+    .bar-bg { background: #e2e8f0; height: 10px; border-radius: 99px; overflow: hidden; width: 100%; min-width: 120px; }
+    .bar-fill { background: var(--accent); height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+    .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+    .stat-row:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
 
-  <header class="hero">
-    <a href="admin.html" class="admin-link">Espace Organisateur 🔒</a>
-    <div class="badge">Semaine Internationale de l'Entrepreneuriat • ENSTP</div>
-    <h1>CAMPUS INNOV' CHALLENGE</h1>
-    <p class="tagline">Imagine, Build & Inspire — Vote du Public</p>
-    <p class="desc">
-      Découvrez les six projets participants et classez-les de la <strong>1ère à la 6ème place</strong> selon votre appréciation personnelle. Chaque étudiant ne dispose que d'une seule participation.
-    </p>
-  </header>
+  <!-- ==================== 1. VUE VOTE ÉTUDIANT ==================== -->
+  <div id="voteView" class="view active">
+    <header class="hero">
+      <div class="top-controls">
+        <button type="button" class="top-btn" onclick="toggleLanguage()" id="langBtn">عربي / FR</button>
+        <button type="button" class="top-btn" onclick="openAdminGate()" data-i18n="adminBtn">Espace Organisateur 🔒</button>
+      </div>
+      <div class="badge" data-i18n="badge">Semaine Internationale de l'Entrepreneuriat • ENSTP</div>
+      <h1 data-i18n="heroTitle">CAMPUS INNOV' CHALLENGE</h1>
+      <p class="tagline" data-i18n="heroTagline">Imagine, Build & Inspire — Vote du Public</p>
+      <p class="desc" data-i18n="heroDesc">
+        Découvrez les six projets participants et classez-les de la 1ère à la 6ème place selon votre appréciation personnelle. Chaque étudiant ne dispose que d'une seule participation.
+      </p>
+    </header>
 
-  <main class="container">
-    <div id="errorAlert" class="alert"></div>
+    <main class="container">
+      <div id="errorAlert" class="alert"></div>
 
-    <!-- Formulaire de Vote -->
-    <form id="voteForm">
-      <!-- 1. Identification -->
-      <div class="card">
-        <div class="section-title"><span class="step-num">1</span> Identification de l'étudiant</div>
-        <p class="section-sub">Votre adresse e-mail est requise pour garantir un vote unique par étudiant.</p>
-        <div class="grid-2">
-          <div>
-            <label class="field-label" for="voterEmail">Adresse e-mail (ENSTP ou personnelle) *</label>
-            <input type="email" id="voterEmail" placeholder="exemple@enstp.edu.dz" required />
-          </div>
-          <div>
-            <label class="field-label" for="studyYear">Année d'étude *</label>
-            <select id="studyYear" class="form-select" required>
-              <option value="" disabled selected>Sélectionnez votre année...</option>
-              <option value="CP1">CP1</option>
-              <option value="CP2">CP2</option>
-              <option value="3e année DIB">3e année DIB</option>
-              <option value="4e année DIB">4e année DIB</option>
-              <option value="5e année DIB">5e année DIB</option>
-              <option value="Autre">Autre</option>
-            </select>
+      <form id="voteForm">
+        <div class="card">
+          <div class="section-title"><span class="step-num">1</span> <span data-i18n="step1Title">Identification de l'étudiant</span></div>
+          <p class="section-sub" data-i18n="step1Sub">Votre adresse e-mail est requise pour garantir un vote unique par étudiant.</p>
+          <div class="grid-2">
+            <div>
+              <label class="field-label" for="voterEmail" data-i18n="emailLabel">Adresse e-mail *</label>
+              <input type="email" id="voterEmail" placeholder="exemple@enstp.edu.dz" required />
+            </div>
+            <div>
+              <label class="field-label" for="studyYear" data-i18n="yearLabel">Année d'étude *</label>
+              <select id="studyYear" class="form-select" required>
+                <option value="" disabled selected data-i18n="yearDefault">Sélectionnez votre année...</option>
+                <option value="CP1">CP1</option>
+                <option value="CP2">CP2</option>
+                <option value="3e année DIB">3e année DIB</option>
+                <option value="4e année DIB">4e année DIB</option>
+                <option value="5e année DIB">5e année DIB</option>
+                <option value="Autre" data-i18n="yearOther">Autre</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 2. Classement des 6 groupes -->
-      <div class="card">
-        <div class="section-title"><span class="step-num">2</span> Classement des six groupes participants *</div>
-        <p class="section-sub">
-          Attribuez une position unique à chaque projet (<strong>1er</strong> = meilleur projet, <strong>6e</strong> = sixième place). Une même position ne peut être attribuée qu'à un seul groupe.
-        </p>
-        <div class="ranking-list" id="rankingContainer"></div>
-      </div>
-
-      <!-- 3. Question complémentaire -->
-      <div class="card">
-        <div class="section-title"><span class="step-num">3</span> Question complémentaire (facultative)</div>
-        <p class="section-sub">Quel aspect avez-vous particulièrement apprécié dans les projets présentés ?</p>
-        <div class="checkbox-grid">
-          <label class="check-item"><input type="checkbox" name="aspects" value="Créativité et originalité"> Créativité et originalité</label>
-          <label class="check-item"><input type="checkbox" name="aspects" value="Qualité du travail réalisé"> Qualité du travail réalisé</label>
-          <label class="check-item"><input type="checkbox" name="aspects" value="Utilité du projet pour les étudiants"> Utilité du projet pour les étudiants</label>
-          <label class="check-item"><input type="checkbox" name="aspects" value="Design et présentation"> Design et présentation</label>
-          <label class="check-item"><input type="checkbox" name="aspects" value="Innovation et communication"> Innovation et communication</label>
-          <label class="check-item"><input type="checkbox" name="aspects" value="Impact et visibilité du projet"> Impact et visibilité du projet</label>
+        <div class="card">
+          <div class="section-title"><span class="step-num">2</span> <span data-i18n="step2Title">Classement des six groupes participants *</span></div>
+          <p class="section-sub" data-i18n="step2Sub">
+            Attribuez une position unique à chaque projet (1er = meilleur projet, 6e = sixième place). Une même position ne peut être attribuée qu'à un seul groupe.
+          </p>
+          <div class="ranking-list" id="rankingContainer"></div>
         </div>
+
+        <div class="card">
+          <div class="section-title"><span class="step-num">3</span> <span data-i18n="step3Title">Question complémentaire (facultative)</span></div>
+          <p class="section-sub" data-i18n="step3Sub">Quel aspect avez-vous particulièrement apprécié dans les projets présentés ?</p>
+          <div class="checkbox-grid">
+            <label class="check-item"><input type="checkbox" name="aspects" value="Créativité et originalité"> <span data-i18n="asp1">Créativité et originalité</span></label>
+            <label class="check-item"><input type="checkbox" name="aspects" value="Qualité du travail réalisé"> <span data-i18n="asp2">Qualité du travail réalisé</span></label>
+            <label class="check-item"><input type="checkbox" name="aspects" value="Utilité du projet pour les étudiants"> <span data-i18n="asp3">Utilité du projet pour les étudiants</span></label>
+            <label class="check-item"><input type="checkbox" name="aspects" value="Design et présentation"> <span data-i18n="asp4">Design et présentation</span></label>
+            <label class="check-item"><input type="checkbox" name="aspects" value="Innovation et communication"> <span data-i18n="asp5">Innovation et communication</span></label>
+            <label class="check-item"><input type="checkbox" name="aspects" value="Impact et visibilité du projet"> <span data-i18n="asp6">Impact et visibilité du projet</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submitBtn" data-i18n="submitBtn">Valider mon vote définitif</button>
+      </form>
+
+      <div class="card success-box" id="successBox">
+        <div class="success-icon">✓</div>
+        <h2 data-i18n="succTitle">MERCI POUR VOTRE PARTICIPATION !</h2>
+        <p><strong data-i18n="succSub">Votre vote a bien été enregistré.</strong></p>
+        <p data-i18n="succText1">Merci d'avoir contribué à cette initiative et d'avoir soutenu les projets de nos étudiants.</p>
+        <p data-i18n="succText2">Ensemble, encourageons l'innovation, la créativité et l'esprit entrepreneurial au sein de l'ENSTP !</p>
+        <p class="motto">CAMPUS INNOV' CHALLENGE – Imagine, Build & Inspire</p>
       </div>
+    </main>
+  </div>
 
-      <button type="submit" class="btn-submit" id="submitBtn">Valider mon vote définitif</button>
-    </form>
-
-    <!-- Message de confirmation officiel -->
-    <div class="card success-box" id="successBox">
-      <div class="success-icon">✓</div>
-      <h2>MERCI POUR VOTRE PARTICIPATION !</h2>
-      <p><strong>Votre vote a bien été enregistré.</strong></p>
-      <p>Merci d'avoir contribué à cette initiative et d'avoir soutenu les projets de nos étudiants.</p>
-      <p>Ensemble, encourageons l'innovation, la créativité et l'esprit entrepreneurial au sein de l'ENSTP !</p>
-      <p class="motto">CAMPUS INNOV' CHALLENGE – Imagine, Build & Inspire</p>
+  <!-- ==================== 2. VUE CONNEXION ADMIN ==================== -->
+  <div id="loginView" class="view">
+    <div class="login-wrapper">
+      <div class="login-card">
+        <h2 data-i18n="loginTitle">Accès Organisateur 🔒</h2>
+        <p data-i18n="loginSub">Connectez-vous avec votre e-mail administrateur pour consulter le dépouillement du Vote du Public.</p>
+        <div class="alert error" id="loginError" style="display:none;"></div>
+        <form id="loginForm">
+          <div class="field">
+            <label class="field-label" data-i18n="emailLabel">Adresse e-mail</label>
+            <input type="email" id="adminEmail" required placeholder="admin@enstp.edu.dz" />
+          </div>
+          <div class="field">
+            <label class="field-label" data-i18n="passLabel">Mot de passe</label>
+            <input type="password" id="adminPassword" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn-primary" id="loginBtn" data-i18n="loginBtnText">Se connecter aux résultats</button>
+        </form>
+        <button type="button" class="back-link" onclick="switchView('voteView')" data-i18n="backBtn">← Retour au formulaire de vote</button>
+      </div>
     </div>
-  </main>
+  </div>
 
-  <script src="config.js"></script>
+  <!-- ==================== 3. VUE RÉSULTATS ADMIN ==================== -->
+  <div id="dashboardView" class="view">
+    <div class="topbar">
+      <h2 data-i18n="dashTitle">📊 Dépouillement Officiel — CAMPUS INNOV' CHALLENGE</h2>
+      <div class="topbar-actions">
+        <button type="button" class="btn-sm" onclick="switchView('voteView')" data-i18n="formBtn">Formulaire</button>
+        <button type="button" class="btn-sm" onclick="loadResults()" data-i18n="refreshBtn">🔄 Actualiser</button>
+        <button type="button" class="btn-sm btn-export" onclick="exportCSV()" data-i18n="exportBtn">📥 Exporter CSV</button>
+        <button type="button" class="btn-sm" onclick="logout()" data-i18n="logoutBtn">Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="dash-container">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label" data-i18n="kpi1">Total des votes valides</div>
+          <div class="kpi-value" id="totalVotes">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label" data-i18n="kpi2">Projet en tête (Lauréat)</div>
+          <div class="kpi-value" id="leaderName" style="color: #d97706;">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label" data-i18n="kpi3">Score du leader</div>
+          <div class="kpi-value" id="leaderPoints">0 pts</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 data-i18n="tableTitle">🏆 Classement Général (1er = 6 pts, 2e = 5 pts, 3e = 4 pts, 4e = 3 pts, 5e = 2 pts, 6e = 1 pt)</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="th1">Rang</th>
+                <th data-i18n="th2">Projet</th>
+                <th data-i18n="th3">Points Totaux</th>
+                <th data-i18n="th4">1ères Places</th>
+                <th data-i18n="th5">Progression</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h3 data-i18n="statYearTitle">🎓 Participation par année d'étude</h3>
+          <div id="yearStats"></div>
+        </div>
+        <div class="panel">
+          <h3 data-i18n="statAspectTitle">💡 Aspects les plus appréciés</h3>
+          <div id="aspectStats"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 data-i18n="votersTitle">📋 Derniers votes enregistrés</h3>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="voterTh1">E-mail étudiant</th>
+                <th data-i18n="voterTh2">Année</th>
+                <th data-i18n="voterTh3">1er choix</th>
+                <th data-i18n="voterTh4">Date</th>
+              </tr>
+            </thead>
+            <tbody id="votersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // État des classements : { "ENSTP GO": 1, "URBEE": 2, ... }
+    // ================= CONFIGURATION SUPABASE =================
+    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const PROJECTS = [
+      { id: 'ENSTP GO', name: 'ENSTP GO', tag: { fr: 'Mobilité & Campus', ar: 'تنقل وحرم جامعي' } },
+      { id: 'URBEE', name: 'URBEE', tag: { fr: 'Smart City', ar: 'مدينة ذكية' } },
+      { id: 'CONGUROU', name: 'CONGUROU', tag: { fr: 'Logistique & Innovation', ar: 'لوجستيك وإبتكار' } },
+      { id: 'BEEVER', name: 'BEEVER', tag: { fr: 'Ingénierie & Construction', ar: 'هندسة وبناء' } },
+      { id: 'ENSTP 360', name: 'ENSTP 360', tag: { fr: 'Visite Virtuelle & Tech', ar: 'زيارة افتراضية وتكنولوجيا' } },
+      { id: 'ENSTP NAV', name: 'ENSTP NAV', tag: { fr: 'Navigation & Orientation', ar: 'توجيه وخرائط' } }
+    ];
+    const POINTS_MAP = { 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1 };
+
+    // ================= DICTIONNAIRE DES LANGUES =================
+    let currentLang = 'fr'; // fr ou ar
+
+    const translations = {
+      fr: {
+        adminBtn: "Espace Organisateur 🔒",
+        badge: "Semaine Internationale de l'Entrepreneuriat • ENSTP",
+        heroTitle: "CAMPUS INNOV' CHALLENGE",
+        heroTagline: "Imagine, Build & Inspire — Vote du Public",
+        heroDesc: "Découvrez les six projets participants et classez-les de la 1ère à la 6ème place selon votre appréciation personnelle. Chaque étudiant ne dispose que d'une seule participation.",
+        step1Title: "Identification de l'étudiant",
+        step1Sub: "Votre adresse e-mail est requise pour garantir un vote unique par étudiant.",
+        emailLabel: "Adresse e-mail *",
+        yearLabel: "Année d'étude *",
+        yearDefault: "Sélectionnez votre année...",
+        yearOther: "Autre",
+        step2Title: "Classement des six groupes participants *",
+        step2Sub: "Attribuez une position unique à chaque projet (1er = meilleur projet, 6e = sixième place). Une même position ne peut être attribuée qu'à un seul groupe.",
+        step3Title: "Question complémentaire (facultative)",
+        step3Sub: "Quel aspect avez-vous particulièrement apprécié dans les projets présentés ?",
+        asp1: "Créativité et originalité",
+        asp2: "Qualité du travail réalisé",
+        asp3: "Utilité du projet pour les étudiants",
+        asp4: "Design et présentation",
+        asp5: "Innovation et communication",
+        asp6: "Impact et visibilité du projet",
+        submitBtn: "Valider mon vote définitif",
+        succTitle: "MERCI POUR VOTRE PARTICIPATION !",
+        succSub: "Votre vote a bien été enregistré.",
+        succText1: "Merci d'avoir contribué à cette initiative et d'avoir soutenu les projets de nos étudiants.",
+        succText2: "Ensemble, encourageons l'innovation, la créativité et l'esprit entrepreneurial au sein de l'ENSTP !",
+        loginTitle: "Accès Organisateur 🔒",
+        loginSub: "Connectez-vous avec votre e-mail administrateur pour consulter le dépouillement du Vote du Public.",
+        passLabel: "Mot de passe",
+        loginBtnText: "Se connecter aux résultats",
+        backBtn: "← Retour au formulaire de vote",
+        dashTitle: "📊 Dépouillement Officiel — CAMPUS INNOV' CHALLENGE",
+        formBtn: "Formulaire",
+        refreshBtn: "🔄 Actualiser",
+        exportBtn: "📥 Exporter CSV",
+        logoutBtn: "Déconnexion",
+        kpi1: "Total des votes valides",
+        kpi2: "Projet en tête (Lauréat)",
+        kpi3: "Score du leader",
+        tableTitle: "🏆 Classement Général (1er = 6 pts, 2e = 5 pts, 3e = 4 pts, 4e = 3 pts, 5e = 2 pts, 6e = 1 pt)",
+        th1: "Rang", th2: "Projet", th3: "Points Totaux", th4: "1ères Places", th5: "Progression",
+        statYearTitle: "🎓 Participation par année d'étude",
+        statAspectTitle: "💡 Aspects les plus appréciés",
+        votersTitle: "📋 Derniers votes enregistrés",
+        voterTh1: "E-mail étudiant", voterTh2: "Année", voterTh3: "1er choix", voterTh4: "Date"
+      },
+      ar: {
+        adminBtn: "فضاء المنظمين 🔒",
+        badge: "الأسبوع الدولي للمقاولاتية • المدرسة العليا للأشغال العمومية",
+        heroTitle: "تحدي الابتكار بالحرم الجامعي (CAMPUS INNOV')",
+        heroTagline: "تخيل، ابنِ وألهم — تصويت الجمهور",
+        heroTagline: "اكتشف المشاريع الستة المشاركة ورتبها من المركز الأول إلى السادس حسب تقييمك الشخصي. يملك كل طالب مشاركة واحدة فقط.",
+        heroDesc: "اكتشف المشاريع الستة المشاركة ورتبها من المركز الأول إلى السادس.",
+        step1Title: "تعريف الطالب",
+        step1Sub: "بريدك الإلكتروني مطلوب لضمان تصويت واحد لكل طالب.",
+        emailLabel: "البريد الإلكتروني *",
+        yearLabel: "السنة الدراسية *",
+        yearDefault: "اختر سنتك الدراسية...",
+        yearOther: "أخرى",
+        step2Title: "ترتيب المجموعات الست المشاركة *",
+        step2Sub: "حدد مرتبة فريدة لكل مشروع (الأول = الأفضل، السادس = الأخير). لا يمكن منح نفس المرتبة لمشروعين.",
+        step3Title: "سؤال إضافي (اختياري)",
+        step3Sub: "ما هو الجانب الذي أعجبك بشكل خاص في المشاريع المعروضة؟",
+        asp1: "الإبداع والأصالة",
+        asp2: "جودة العمل المنجز",
+        asp3: "فائدة المشروع للطلبة",
+        asp4: "التصميم والعرض",
+        asp5: "الابتكار والتواصل",
+        asp6: "تأثير المشروع وظهوره",
+        submitBtn: "تأكيد وإرسال صوتي نهائياً",
+        succTitle: "شكراً على مشاركتك!",
+        succSub: "تم تسجيل صوتك بنجاح.",
+        succText1: "شكراً لمساهمتك في هذه المبادرة ودعم مشاريع طلابنا.",
+        succText2: "معاً، لنشجع الابتكار والإبداع وروح المقاولاتية في المدرسة العليا للأشغال العمومية!",
+        loginTitle: "دخول المسؤول 🔒",
+        loginSub: "سجل الدخول ببريدك الإلكتروني الإداري للاطلاع على نتائج التصويت المباشرة.",
+        passLabel: "كلمة المرور",
+        loginBtnText: "عرض النتائج",
+        backBtn: "← العودة إلى استمارة التصويت",
+        dashTitle: "📊 النتائج الرسمية — CAMPUS INNOV' CHALLENGE",
+        formBtn: "الاستمارة",
+        refreshBtn: "🔄 تحديث",
+        exportBtn: "📥 تصدير CSV",
+        logoutBtn: "تسجيل الخروج",
+        kpi1: "إجمالي الأصوات الصحيحة",
+        kpi2: "المشروع المتصدر",
+        kpi3: "نقاط المتصدر",
+        tableTitle: "🏆 الترتيب العام (الأول = 6 ن، الثاني = 5 ن ... السادس = 1 ن)",
+        th1: "المرتبة", th2: "المشروع", th3: "مجموع النقاط", th4: "مراكز أولى", th5: "التقدم",
+        statYearTitle: "🎓 المشاركة حسب السنة الدراسية",
+        statAspectTitle: "💡 الجوانب الأكثر إعجاباً",
+        votersTitle: "📋 آخر الأصوات المسجلة",
+        voterTh1: "بريد الطالب", voterTh2: "السنة", voterTh3: "الخيار الأول", voterTh4: "التاريخ"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'fr' ? 'ar' : 'fr';
+      const html = document.getElementById('htmlRoot');
+      html.setAttribute('lang', currentLang);
+      html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+      document.getElementById('langBtn').textContent = currentLang === 'fr' ? 'عربي / FR' : 'FR / عربي';
+
+      // تحديث النصوص
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+          el.textContent = translations[currentLang][key];
+        }
+      });
+      renderProjects();
+    }
+
+    // ================= NAVIGATION ENTRE VUES =================
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function openAdminGate() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        switchView('dashboardView');
+        loadResults();
+      } else {
+        switchView('loginView');
+      }
+    }
+
+    // ================= LOGIQUE DE VOTE =================
     const selectedRanks = {};
     const rankingContainer = document.getElementById('rankingContainer');
     const voteForm = document.getElementById('voteForm');
     const successBox = document.getElementById('successBox');
     const errorAlert = document.getElementById('errorAlert');
 
-    // Vérifier si l'appareil a déjà voté
     if (localStorage.getItem('enstp_campus_innov_voted') === 'true') {
       voteForm.style.display = 'none';
       successBox.style.display = 'block';
@@ -267,11 +577,11 @@
         for (let r = 1; r <= 6; r++) {
           const isSelected = currentRank === r;
           const isTakenByOther = !isSelected && usedRanks.includes(r);
-          const label = r === 1 ? '1er' : `${r}e`;
+          const label = currentLang === 'ar' ? (r === 1 ? 'الأول' : `${r}`) : (r === 1 ? '1er' : `${r}e`);
           buttonsHTML += `
             <button type="button"
               class="rank-btn ${isSelected ? 'active' : ''}"
-              ${isTakenByOther ? 'disabled title="Position déjà attribuée à un autre groupe"' : ''}
+              ${isTakenByOther ? 'disabled title="Position déjà attribuée"' : ''}
               onclick="selectRank('${project.id}', ${r})">
               ${label}
             </button>
@@ -281,7 +591,7 @@
         row.innerHTML = `
           <div class="project-info">
             <h3>${project.name}</h3>
-            <span>${project.tag}</span>
+            <span>${project.tag[currentLang]}</span>
           </div>
           <div class="rank-pills">${buttonsHTML}</div>
         `;
@@ -291,27 +601,26 @@
 
     window.selectRank = function(projectId, rank) {
       if (selectedRanks[projectId] === rank) {
-        delete selectedRanks[projectId]; // Permet de désélectionner en recliquant
+        delete selectedRanks[projectId];
       } else {
         selectedRanks[projectId] = rank;
       }
       renderProjects();
     };
-
     renderProjects();
 
     voteForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorAlert.className = 'alert';
-      errorAlert.textContent = '';
+      errorAlert.style.display = 'none';
 
       const email = document.getElementById('voterEmail').value.trim().toLowerCase();
       const studyYear = document.getElementById('studyYear').value;
 
-      // Vérifier que les 6 groupes sont classés
       if (Object.keys(selectedRanks).length !== 6) {
-        errorAlert.textContent = 'Veuillez attribuer une position (de 1er à 6e) à chacun des six groupes participants.';
-        errorAlert.className = 'alert error';
+        errorAlert.textContent = currentLang === 'fr' 
+          ? 'Veuillez attribuer une position à chacun des six groupes.' 
+          : 'يرجى تحديد مرتبة لكل المجموعات الست.';
+        errorAlert.style.display = 'block';
         errorAlert.scrollIntoView({ behavior: 'smooth' });
         return;
       }
@@ -319,7 +628,7 @@
       const aspects = Array.from(document.querySelectorAll('input[name="aspects"]:checked')).map(cb => cb.value);
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Enregistrement en cours...';
+      submitBtn.textContent = currentLang === 'fr' ? 'Enregistrement...' : 'جاري التسجيل...';
 
       const { error } = await supabaseClient
         .from('campus_votes')
@@ -332,23 +641,158 @@
 
       if (error) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Valider mon vote définitif';
-        if (error.code === '23505') {
-          errorAlert.textContent = 'Cette adresse e-mail a déjà participé au vote. Un seul vote par étudiant est autorisé.';
-        } else {
-          errorAlert.textContent = 'Erreur lors de l’envoi du vote : ' + error.message;
-        }
-        errorAlert.className = 'alert error';
+        submitBtn.textContent = translations[currentLang].submitBtn;
+        errorAlert.textContent = error.code === '23505'
+          ? (currentLang === 'fr' ? 'Cette adresse e-mail a déjà participé.' : 'هذا البريد الإلكتروني شارك مسبقاً.')
+          : 'Erreur : ' + error.message;
+        errorAlert.style.display = 'block';
         errorAlert.scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
-      // Enregistrer localement et afficher le message de confirmation
       localStorage.setItem('enstp_campus_innov_voted', 'true');
       voteForm.style.display = 'none';
       successBox.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // ================= LOGIQUE ADMIN & RÉSULTATS =================
+    let rawVotesData = [];
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const loginError = document.getElementById('loginError');
+      const loginBtn = document.getElementById('loginBtn');
+      loginError.style.display = 'none';
+
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        loginError.textContent = 'Identifiants incorrects.';
+        loginError.style.display = 'block';
+        return;
+      }
+
+      switchView('dashboardView');
+      loadResults();
+    });
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      switchView('voteView');
+    }
+
+    async function loadResults() {
+      const { data, error } = await supabaseClient
+        .from('campus_votes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        alert('Erreur : ' + error.message);
+        return;
+      }
+      rawVotesData = data || [];
+      computeDashboard(rawVotesData);
+    }
+
+    function computeDashboard(votes) {
+      document.getElementById('totalVotes').textContent = votes.length;
+
+      const scores = {};
+      const firstPlaces = {};
+      PROJECTS.forEach(p => { scores[p.id] = 0; firstPlaces[p.id] = 0; });
+
+      const yearCounts = {};
+      const aspectCounts = {};
+
+      votes.forEach(v => {
+        Object.entries(v.ranks || {}).forEach(([projId, rank]) => {
+          const pts = POINTS_MAP[rank] || 0;
+          if (scores[projId] !== undefined) scores[projId] += pts;
+          if (rank === 1 && firstPlaces[projId] !== undefined) firstPlaces[projId]++;
+        });
+        yearCounts[v.study_year] = (yearCounts[v.study_year] || 0) + 1;
+        (v.appreciated_aspects || []).forEach(asp => {
+          aspectCounts[asp] = (aspectCounts[asp] || 0) + 1;
+        });
+      });
+
+      const sorted = PROJECTS.map(p => ({
+        ...p,
+        points: scores[p.id],
+        firsts: firstPlaces[p.id]
+      })).sort((a, b) => b.points - a.points || b.firsts - a.firsts);
+
+      const maxPoints = sorted[0]?.points || 1;
+      if (votes.length > 0) {
+        document.getElementById('leaderName').textContent = sorted[0].name;
+        document.getElementById('leaderPoints').textContent = `${sorted[0].points} pts`;
+      }
+
+      document.getElementById('leaderboardBody').innerHTML = sorted.map((p, idx) => {
+        const pos = idx + 1;
+        const pct = votes.length ? Math.round((p.points / maxPoints) * 100) : 0;
+        return `
+          <tr>
+            <td><span class="rank-badge rank-${pos}">${pos}</span></td>
+            <td><strong>${p.name}</strong><br><small style="color:#64748b">${p.tag[currentLang]}</small></td>
+            <td><strong style="font-size:1.05rem; color:#2563eb">${p.points} pts</strong></td>
+            <td>${p.firsts}</td>
+            <td><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('yearStats').innerHTML = Object.entries(yearCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([yr, count]) => `<div class="stat-row"><span>${yr}</span><strong>${count}</strong></div>`)
+        .join('') || '<p style="color:#64748b;font-size:0.9rem">Aucune donnée</p>';
+
+      document.getElementById('aspectStats').innerHTML = Object.entries(aspectCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([asp, count]) => `<div class="stat-row"><span>${asp}</span><strong>${count}</strong></div>`)
+        .join('') || '<p style="color:#64748b;font-size:0.9rem">Aucune donnée</p>';
+
+      document.getElementById('votersTableBody').innerHTML = votes.slice(0, 20).map(v => {
+        const firstChoice = Object.entries(v.ranks || {}).find(([_, r]) => r === 1)?.[0] || '-';
+        const dateStr = new Date(v.created_at).toLocaleString('fr-FR');
+        return `
+          <tr>
+            <td>${v.voter_email}</td>
+            <td>${v.study_year}</td>
+            <td><strong>${firstChoice}</strong></td>
+            <td style="color:#64748b;font-size:0.85rem">${dateStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportCSV() {
+      if (!rawVotesData.length) return alert('Aucun vote.');
+      const headers = ['Email', 'Annee', 'ENSTP GO', 'URBEE', 'CONGUROU', 'BEEVER', 'ENSTP 360', 'ENSTP NAV', 'Aspects', 'Date'];
+      const rows = rawVotesData.map(v => [
+        v.voter_email,
+        v.study_year,
+        v.ranks['ENSTP GO'] || '',
+        v.ranks['URBEE'] || '',
+        v.ranks['CONGUROU'] || '',
+        v.ranks['BEEVER'] || '',
+        v.ranks['ENSTP 360'] || '',
+        v.ranks['ENSTP NAV'] || '',
+        `"${(v.appreciated_aspects || []).join('; ')}"`,
+        v.created_at
+      ]);
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', 'resultats_campus_innov_2026.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   </script>
 </body>
 </html>

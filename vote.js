@@ -1,6 +1,6 @@
 // استبدل القيمتين التاليتين ببيانات مشروعك من Supabase
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const SUPABASE_URL = 'https://fynbdujbtbqsoahhsylo.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_t1yPBiRKFGvdgQKYfZvL8w_LbloOd2f';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

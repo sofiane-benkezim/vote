@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAMPUS INNOV' CHALLENGE — Vote du Public | ENSTP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --gold: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 60px; }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: white;
+      padding: 48px 20px 64px;
+      text-align: center;
+      position: relative;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fcd34d;
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .hero h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 8px; }
+    .hero p.tagline { font-size: 1.05rem; color: #93c5fd; font-weight: 600; margin-bottom: 14px; }
+    .hero p.desc { max-width: 680px; margin: 0 auto; color: #cbd5e1; font-size: 0.95rem; }
+
+    .admin-link {
+      position: absolute; top: 16px; right: 20px;
+      color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.82rem;
+      padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+      transition: 0.2s;
+    }
+    .admin-link:hover { color: white; background: rgba(255,255,255,0.1); }
+
+    /* Container */
+    .container { max-width: 820px; margin: -36px auto 0; padding: 0 16px; position: relative; z-index: 2; }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.15rem; font-weight: 700; color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .step-num {
+      background: var(--accent); color: white; width: 28px; height: 28px;
+      border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800; flex-shrink: 0;
+    }
+    .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+    /* Form Inputs */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    label.field-label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: var(--primary); }
+    input[type="email"], select.form-select {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 0.95rem; outline: none; transition: 0.2s; background: white;
+    }
+    input[type="email"]:focus, select.form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+
+    /* Ranking Matrix */
+    .ranking-list { display: flex; flex-direction: column; gap: 12px; }
+    .project-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 12px;
+      transition: 0.2s; background: #fff;
+    }
+    .project-row.ranked { border-color: #93c5fd; background: #eff6ff; }
+    .project-info h3 { font-size: 1rem; font-weight: 700; color: var(--primary); }
+    .project-info span { font-size: 0.8rem; color: var(--muted); }
+
+    .rank-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .rank-btn {
+      width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: white; font-weight: 700; font-size: 0.88rem; cursor: pointer;
+      transition: all 0.15s ease; color: var(--text);
+    }
+    .rank-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .rank-btn.active {
+      background: var(--accent); border-color: var(--accent); color: white;
+      transform: scale(1.05); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+    .rank-btn:disabled { opacity: 0.35; cursor: not-allowed; background: #f1f5f9; }
+
+    @media (max-width: 600px) {
+      .project-row { flex-direction: column; align-items: flex-start; }
+      .rank-pills { width: 100%; justify-content: space-between; }
+      .rank-btn { flex: 1; height: 42px; }
+    }
+
+    /* Checkboxes */
+    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 600px) { .checkbox-grid { grid-template-columns: 1fr; } }
+
+    .check-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 500; transition: 0.15s; user-select: none;
+    }
+    .check-item:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .check-item input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%; padding: 16px; background: var(--accent); color: white;
+      border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    }
+    .btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .alert {
+      padding: 14px 16px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+      margin-bottom: 18px; display: none;
+    }
+    .alert.error { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; display: block; }
+
+    /* Success State */
+    .success-box { text-align: center; padding: 44px 24px; display: none; }
+    .success-icon {
+      width: 68px; height: 68px; background: #d1fae5; color: var(--success);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 20px; font-weight: bold;
+    }
+    .success-box h2 { font-size: 1.5rem; color: var(--primary); margin-bottom: 12px; }
+    .success-box p { color: var(--muted); max-width: 540px; margin: 0 auto 12px; }
+    .motto { font-weight: 700; color: var(--accent); margin-top: 18px; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <a href="admin.html" class="admin-link">Espace Organisateur 🔒</a>
+    <div class="badge">Semaine Internationale de l'Entrepreneuriat • ENSTP</div>
+    <h1>CAMPUS INNOV' CHALLENGE</h1>
+    <p class="tagline">Imagine, Build & Inspire — Vote du Public</p>
+    <p class="desc">
+      Découvrez les six projets participants et classez-les de la <strong>1ère à la 6ème place</strong> selon votre appréciation personnelle. Chaque étudiant ne dispose que d'une seule participation.
+    </p>
+  </header>
+
+  <main class="container">
+    <div id="errorAlert" class="alert"></div>
+
+    <!-- Formulaire de Vote -->
+    <form id="voteForm">
+      <!-- 1. Identification -->
+      <div class="card">
+        <div class="section-title"><span class="step-num">1</span> Identification de l'étudiant</div>
+        <p class="section-sub">Votre adresse e-mail est requise pour garantir un vote unique par étudiant.</p>
+        <div class="grid-2">
+          <div>
+            <label class="field-label" for="voterEmail">Adresse e-mail (ENSTP ou personnelle) *</label>
+            <input type="email" id="voterEmail" placeholder="exemple@enstp.edu.dz" required />
+          </div>
+          <div>
+            <label class="field-label" for="studyYear">Année d'étude *</label>
+            <select id="studyYear" class="form-select" required>
+              <option value="" disabled selected>Sélectionnez votre année...</option>
+              <option value="CP1">CP1</option>
+              <option value="CP2">CP2</option>
+              <option value="3e année DIB">3e année DIB</option>
+              <option value="4e année DIB">4e année DIB</option>
+              <option value="5e année DIB">5e année DIB</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Classement des 6 groupes -->
+      <div class="card">
+        <div class="section-title"><span class="step-num">2</span> Classement des six groupes participants *</div>
+        <p class="section-sub">
+          Attribuez une position unique à chaque projet (<strong>1er</strong> = meilleur projet, <strong>6e</strong> = sixième place). Une même position ne peut être attribuée qu'à un seul groupe.
+        </p>
+        <div class="ranking-list" id="rankingContainer"></div>
+      </div>
+
+      <!-- 3. Question complémentaire -->
+      <div class="card">
+        <div class="section-title"><span class="step-num">3</span> Question complémentaire (facultative)</div>
+        <p class="section-sub">Quel aspect avez-vous particulièrement apprécié dans les projets présentés ?</p>
+        <div class="checkbox-grid">
+          <label class="check-item"><input type="checkbox" name="aspects" value="Créativité et originalité"> Créativité et originalité</label>
+          <label class="check-item"><input type="checkbox" name="aspects" value="Qualité du travail réalisé"> Qualité du travail réalisé</label>
+          <label class="check-item"><input type="checkbox" name="aspects" value="Utilité du projet pour les étudiants"> Utilité du projet pour les étudiants</label>
+          <label class="check-item"><input type="checkbox" name="aspects" value="Design et présentation"> Design et présentation</label>
+          <label class="check-item"><input type="checkbox" name="aspects" value="Innovation et communication"> Innovation et communication</label>
+          <label class="check-item"><input type="checkbox" name="aspects" value="Impact et visibilité du projet"> Impact et visibilité du projet</label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Valider mon vote définitif</button>
+    </form>
+
+    <!-- Message de confirmation officiel -->
+    <div class="card success-box" id="successBox">
+      <div class="success-icon">✓</div>
+      <h2>MERCI POUR VOTRE PARTICIPATION !</h2>
+      <p><strong>Votre vote a bien été enregistré.</strong></p>
+      <p>Merci d'avoir contribué à cette initiative et d'avoir soutenu les projets de nos étudiants.</p>
+      <p>Ensemble, encourageons l'innovation, la créativité et l'esprit entrepreneurial au sein de l'ENSTP !</p>
+      <p class="motto">CAMPUS INNOV' CHALLENGE – Imagine, Build & Inspire</p>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script>
+    // État des classements : { "ENSTP GO": 1, "URBEE": 2, ... }
+    const selectedRanks = {};
+    const rankingContainer = document.getElementById('rankingContainer');
+    const voteForm = document.getElementById('voteForm');
+    const successBox = document.getElementById('successBox');
+    const errorAlert = document.getElementById('errorAlert');
+
+    // Vérifier si l'appareil a déjà voté
+    if (localStorage.getItem('enstp_campus_innov_voted') === 'true') {
+      voteForm.style.display = 'none';
+      successBox.style.display = 'block';
+    }
+
+    function renderProjects() {
+      rankingContainer.innerHTML = '';
+      const usedRanks = Object.values(selectedRanks);
+
+      PROJECTS.forEach(project => {
+        const currentRank = selectedRanks[project.id];
+        const row = document.createElement('div');
+        row.className = `project-row ${currentRank ? 'ranked' : ''}`;
+
+        let buttonsHTML = '';
+        for (let r = 1; r <= 6; r++) {
+          const isSelected = currentRank === r;
+          const isTakenByOther = !isSelected && usedRanks.includes(r);
+          const label = r === 1 ? '1er' : `${r}e`;
+          buttonsHTML += `
+            <button type="button"
+              class="rank-btn ${isSelected ? 'active' : ''}"
+              ${isTakenByOther ? 'disabled title="Position déjà attribuée à un autre groupe"' : ''}
+              onclick="selectRank('${project.id}', ${r})">
+              ${label}
+            </button>
+          `;
+        }
+
+        row.innerHTML = `
+          <div class="project-info">
+            <h3>${project.name}</h3>
+            <span>${project.tag}</span>
+          </div>
+          <div class="rank-pills">${buttonsHTML}</div>
+        `;
+        rankingContainer.appendChild(row);
+      });
+    }
+
+    window.selectRank = function(projectId, rank) {
+      if (selectedRanks[projectId] === rank) {
+        delete selectedRanks[projectId]; // Permet de désélectionner en recliquant
+      } else {
+        selectedRanks[projectId] = rank;
+      }
+      renderProjects();
+    };
+
+    renderProjects();
+
+    voteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorAlert.className = 'alert';
+      errorAlert.textContent = '';
+
+      const email = document.getElementById('voterEmail').value.trim().toLowerCase();
+      const studyYear = document.getElementById('studyYear').value;
+
+      // Vérifier que les 6 groupes sont classés
+      if (Object.keys(selectedRanks).length !== 6) {
+        errorAlert.textContent = 'Veuillez attribuer une position (de 1er à 6e) à chacun des six groupes participants.';
+        errorAlert.className = 'alert error';
+        errorAlert.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      const aspects = Array.from(document.querySelectorAll('input[name="aspects"]:checked')).map(cb => cb.value);
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enregistrement en cours...';
+
+      const { error } = await supabaseClient
+        .from('campus_votes')
+        .insert([{
+          voter_email: email,
+          study_year: studyYear,
+          ranks: selectedRanks,
+          appreciated_aspects: aspects
+        }]);
+
+      if (error) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Valider mon vote définitif';
+        if (error.code === '23505') {
+          errorAlert.textContent = 'Cette adresse e-mail a déjà participé au vote. Un seul vote par étudiant est autorisé.';
+        } else {
+          errorAlert.textContent = 'Erreur lors de l’envoi du vote : ' + error.message;
+        }
+        errorAlert.className = 'alert error';
+        errorAlert.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      // Enregistrer localement et afficher le message de confirmation
+      localStorage.setItem('enstp_campus_innov_voted', 'true');
+      voteForm.style.display = 'none';
+      successBox.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

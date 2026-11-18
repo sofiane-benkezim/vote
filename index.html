@@ -29,7 +29,6 @@
       min-height: 100vh;
     }
 
-    /* دعم اللغة العربية */
     html[lang="ar"] body {
       font-family: 'Cairo', sans-serif;
     }
@@ -37,7 +36,6 @@
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ================= HERO SECTION ================= */
     .hero {
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
       color: white; padding: 52px 20px 68px; text-align: center; position: relative;
@@ -96,7 +94,6 @@
     }
     input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
 
-    /* Ranking Matrix */
     .ranking-list { display: flex; flex-direction: column; gap: 12px; }
     .project-row {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -157,7 +154,6 @@
     .success-box p { color: var(--muted); max-width: 540px; margin: 0 auto 12px; }
     .motto { font-weight: 700; color: var(--accent); margin-top: 18px; }
 
-    /* Admin Login & Dashboard */
     .login-wrapper {
       min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
@@ -403,8 +399,8 @@
 
   <script>
     // ================= CONFIGURATION SUPABASE =================
-    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+    const SUPABASE_URL = 'https://fynbdujbtbqsoahhsylo.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_t1yPBiRKFGvdgQKYfZvL8w_LbloOd2f';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const PROJECTS = [
@@ -418,7 +414,7 @@
     const POINTS_MAP = { 1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1 };
 
     // ================= DICTIONNAIRE DES LANGUES =================
-    let currentLang = 'fr'; // fr ou ar
+    let currentLang = 'fr';
 
     const translations = {
       fr: {
@@ -473,8 +469,7 @@
         badge: "الأسبوع الدولي للمقاولاتية • المدرسة العليا للأشغال العمومية",
         heroTitle: "تحدي الابتكار بالحرم الجامعي (CAMPUS INNOV')",
         heroTagline: "تخيل، ابنِ وألهم — تصويت الجمهور",
-        heroTagline: "اكتشف المشاريع الستة المشاركة ورتبها من المركز الأول إلى السادس حسب تقييمك الشخصي. يملك كل طالب مشاركة واحدة فقط.",
-        heroDesc: "اكتشف المشاريع الستة المشاركة ورتبها من المركز الأول إلى السادس.",
+        heroDesc: "اكتشف المشاريع الستة المشاركة ورتبها من المركز الأول إلى السادس حسب تقييمك الشخصي. يملك كل طالب مشاركة واحدة فقط.",
         step1Title: "تعريف الطالب",
         step1Sub: "بريدك الإلكتروني مطلوب لضمان تصويت واحد لكل طالب.",
         emailLabel: "البريد الإلكتروني *",
@@ -525,7 +520,6 @@
       html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
       document.getElementById('langBtn').textContent = currentLang === 'fr' ? 'عربي / FR' : 'FR / عربي';
 
-      // تحديث النصوص
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[currentLang][key]) {
@@ -535,7 +529,6 @@
       renderProjects();
     }
 
-    // ================= NAVIGATION ENTRE VUES =================
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
@@ -552,7 +545,6 @@
       }
     }
 
-    // ================= LOGIQUE DE VOTE =================
     const selectedRanks = {};
     const rankingContainer = document.getElementById('rankingContainer');
     const voteForm = document.getElementById('voteForm');
@@ -656,13 +648,11 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // ================= LOGIQUE ADMIN & RÉSULTATS =================
     let rawVotesData = [];
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const loginError = document.getElementById('loginError');
-      const loginBtn = document.getElementById('loginBtn');
       loginError.style.display = 'none';
 
       const email = document.getElementById('adminEmail').value.trim();
@@ -794,6 +784,5 @@
       document.body.removeChild(link);
     }
   </script>
-  <script src="vote.js" defer></script>
 </body>
 </html>
